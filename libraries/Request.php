@@ -360,6 +360,7 @@ class Request
 		}
 
 		$requestParams = [
+			'curl' => [],
 			'headers' => [],
 			'allow_redirects' => true,
 			'base_uri' => $schema . $this->headers['Host'],
@@ -391,11 +392,9 @@ class Request
 			{
 				if (is_dir($caCert))
 				{
-					// @curl_setopt($curl, CURLOPT_CAPATH, $caCert);
-				}
-				else
-				{
-					// @curl_setopt($curl, CURLOPT_CAINFO, $caCert);
+					$requestParams['curl'][CURLOPT_CAPATH] = $caCert;
+				} else {
+					$requestParams['curl'][CURLOPT_CAINFO] = $caCert;
 				}
 			}
 
