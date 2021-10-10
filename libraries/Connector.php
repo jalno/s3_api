@@ -144,7 +144,7 @@ class Connector
 	{
 		$request = new Request('GET', $bucket, $uri, clone $this->configuration);
 
-		if ($saveTo !== null) {
+		if ($saveTo) {
 			$file = null;
 			if (is_string($saveTo)) {
 				$file = new File\Local($saveTo);
