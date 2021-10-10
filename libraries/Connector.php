@@ -202,6 +202,12 @@ class Connector
 				print_r($response, true))
 			);
 		}
+		if ($response->getHeader('date')) {
+			$response->setHeader('date', Date\Gregorian::strtotime($response->getHeader('date')));
+		}
+		if ($response->getHeader('last-modified')) {
+			$response->setHeader('last-modified', Date\Gregorian::strtotime($response->getHeader('last-modified')));
+		}
 
 		return $response->getHeaders();
 	}

@@ -429,6 +429,8 @@ class Request
 					$requestParams['body'] = $file;
 				}
 			}
+		} elseif (strtoupper($this->verb) == 'HEAD') {
+			$requestParams['curl_options'][CURLOPT_NOBODY] = true;
 		}
 
 		$httpResponse = null;
