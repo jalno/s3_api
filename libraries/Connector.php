@@ -226,8 +226,8 @@ class Connector
 		$request  = new Request('DELETE', $bucket, $uri, clone $this->configuration);
 		$response = $request->getResponse();
 
-		if (!in_array($response->getStatusCode(), [200, 204])) {
-			throw new CannotGetFile(sprintf(
+		if ($response->getStatusCode() != 204) {
+			throw new CannotDeleteFile(sprintf(
 				__METHOD__ . "({$bucket}, {$uri}): [%s] %s\n\nDebug info:\n%s",
 				$response->getStatusCode(),
 				"Unexpected http code",
