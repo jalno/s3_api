@@ -429,7 +429,7 @@ class Request
 					$requestParams['body'] = $file;
 				}
 			}
-		} elseif (strtoupper($this->verb) == 'HEAD') {
+		} elseif (in_array(strtoupper($this->verb), ['HEAD', 'DELETE'])) {
 			$requestParams['curl_options'][CURLOPT_NOBODY] = true;
 		}
 
