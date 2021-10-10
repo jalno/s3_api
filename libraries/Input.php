@@ -18,6 +18,8 @@ class Input
 	 */
 	const INPUT_DATA = 3;
 
+	const INPUT_DIRECTORY = 4;
+
 	/**
 	 * A local file object
 	 *
@@ -125,6 +127,10 @@ class Input
 		return $input;
 	}
 
+	public static function createForDirectory(): self {
+		return new Input();
+	}
+
 	/**
 	 * Returns the input type (file or data)
 	 *
@@ -133,9 +139,10 @@ class Input
 	public function getInputType(): int {
 		if (!empty($this->file)) {
 			return self::INPUT_FILE;
+		} elseif ($this->data !== null) {
+			return self::INPUT_DATA;
 		}
-
-		return self::INPUT_DATA;
+		return self::INPUT_DIRECTORY;
 	}
 
 	/**
