@@ -385,19 +385,6 @@ class Request
 
 		if ($this->configuration->isSSL())
 		{
-			// Set the CA certificate cache location
-			$caCert = $this->getCaCertLocation();
-
-			if (!empty($caCert))
-			{
-				if (is_dir($caCert))
-				{
-					$requestParams['curl_options'][CURLOPT_CAPATH] = $caCert;
-				} else {
-					$requestParams['curl_options'][CURLOPT_CAINFO] = $caCert;
-				}
-			}
-
 			/**
 			 * Verify the host name in the certificate and the certificate itself.
 			 *
