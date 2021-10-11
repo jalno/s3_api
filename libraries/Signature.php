@@ -49,8 +49,8 @@ abstract class Signature
 	 * Pre-process the request headers before we convert them to cURL-compatible format. Used by signature engines to
 	 * add custom headers, e.g. x-amz-content-sha256
 	 *
-	 * @param   array  $headers     The associative array of headers to process
-	 * @param   array  $amzHeaders  The associative array of amz-* headers to process
+	 * @param   array<string, string|int|null>  $headers     The associative array of headers to process
+	 * @param   array<string, string|int|null>  $amzHeaders  The associative array of amz-* headers to process
 	 *
 	 * @return  void
 	 */

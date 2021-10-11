@@ -1,10 +1,11 @@
 <?php
 namespace packages\aws_s3_api;
 
-use SimpleXMLElement;
 use packages\base\http\Response as BaseResponse;
 use packages\aws_s3_api\Exception\PropertyNotFound;
 use packages\aws_s3_api\Response\Error;
+use RunTimeException;
+use SimpleXMLElement;
 
 class Response extends BaseResponse {
 
@@ -25,12 +26,19 @@ class Response extends BaseResponse {
 		if (empty($file) and is_string($this->getBody()) and (
 			($this->getHeader('type') == 'application/xml') or (substr($this->getBody(), 0, 5) == '<?xml')
 		)) {
-			$this->parsedBody = simplexml_load_string($this->getBody());
+			$xml = simplexml_load_string($this->getBody());
+			if ($xml === false) {
+				throw new RunTimeException('can not parse xml');
+			}
+			$this->parsedBody = $xml;
 		}
 
 		return $this->parsedBody;
 	}
 
+	/**
+	 * @param null|int[] $validHttpStatusCodes
+	 */
 	public function hasValidStatusCode(?array $validHttpStatusCodes = null): bool {
 		$statusCode = $this->getStatusCode();
 		if ($validHttpStatusCodes and !in_array($statusCode, $validHttpStatusCodes)) {

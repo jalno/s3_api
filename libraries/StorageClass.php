@@ -60,7 +60,7 @@ class StorageClass
 	 * for that is that Amazon headers **are** case-insensitive and you could easily end up having two separate headers
 	 * with competing storage classes. This would mess up the signature and your request would promptly fail.
 	 *
-	 * @param   array   $headers
+	 * @param   array<string, string|int|null>   $headers
 	 * @param   string  $storageClass
 	 *
 	 * @return  void

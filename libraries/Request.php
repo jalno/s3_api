@@ -166,11 +166,11 @@ class Request
 	 * Set a request parameter
 	 *
 	 * @param   string       $key    The parameter name
-	 * @param   string|null  $value  The parameter value
+	 * @param   string|int|null  $value  The parameter value
 	 *
 	 * @return  void
 	 */
-	public function setParameter(string $key, ?string $value): void
+	public function setParameter(string $key, $value): void
 	{
 		$this->parameters[$key] = $value;
 	}
@@ -179,11 +179,11 @@ class Request
 	 * Set a request header
 	 *
 	 * @param   string  $key    The header name
-	 * @param   string  $value  The header value
+	 * @param   string|int  $value  The header value
 	 *
 	 * @return  void
 	 */
-	public function setHeader(string $key, string $value): void
+	public function setHeader(string $key, $value): void
 	{
 		$this->headers[$key] = $value;
 	}
@@ -399,7 +399,7 @@ class Request
 		}
 
 		if (in_array(strtoupper($this->verb), ['PUT', 'POST'])) {
-			if (!is_object($this->input) || !($this->input instanceof Input)) {
+			if (!($this->input instanceof Input)) {
 				$this->input = new Input();
 			}
 			$size = $this->input->getSize();
@@ -452,13 +452,13 @@ class Request
 			if ($header == 'last-modified') {
 				$this->response->setHeader('time', Date::strtotime($value));
 			} elseif ($header == 'content-length') {
-				$this->response->setHeader('size', (int) $value);
+				$this->response->setHeader('size', (string) $value);
 			} elseif ($header == 'content-type') {
 				$this->response->setHeader('type', $value);
 			} elseif ($header == 'etag') {
 				$this->response->setHeader(
 					'hash',
-					((is_array($value) and isset($value[0]) and $value[0] == '"') ? substr($value, 1, -1) : $value)
+					((is_array($value) and isset($value[0]) and $value[0] == '"') ? substr($value[0], 1, -1) : $value)
 				);
 			} else {
 				$this->response->setHeader(strtolower($header), is_numeric($value) ? (int) $value : $value);

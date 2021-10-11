@@ -30,7 +30,7 @@ class Input
 	/**
 	 * Data to upload, as a string
 	 *
-	 * @var  string
+	 * @var  string|null
 	 */
 	private $data = null;
 
@@ -239,7 +239,7 @@ class Input
 	 *
 	 * @param   int  $size
 	 */
-	public function setSize(int $size)
+	public function setSize(int $size): void
 	{
 		$this->size = $size;
 	}

@@ -13,9 +13,12 @@ class Exception extends \Exception {
 		);
 	}
 
-	public function __construct(string $code, string $message = '', ?Throwable $previous = null) {
+	/**
+	 * @param string|int $code
+	 */
+	public function __construct($code, string $message = '', ?Throwable $previous = null) {
+		parent::__construct($message, (int) $code, $previous);
 		$this->code = $code;
 		$this->message = $message;
-		parent::__construct($message, $code, $previous);
 	}
 }

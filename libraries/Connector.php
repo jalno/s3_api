@@ -79,7 +79,7 @@ class Connector
 
 		// We need to post with Content-Length and Content-Type, MD5 is optional
 		$request->setHeader('Content-Type', $input->getType());
-		$request->setHeader('Content-Length', $input->getSize());
+		$request->setHeader('Content-Length', (string) $input->getSize());
 
 		if ($input->getMd5sum())
 		{
@@ -793,7 +793,7 @@ class Connector
 
 			case Input::INPUT_FILE:
 				$file = $input->getFile();
-				$fp = fopen($file, 'r');
+				$fp = fopen($file->getPath(), 'r');
 				fseek($fp, ($PartNumber - 1) * $chunkSize);
 				$input->setData(fread($fp, $size));
 				break;
@@ -815,7 +815,7 @@ class Connector
 			}
 		}
 
-		$request->setHeader('Content-Length', $input->getSize());
+		$request->setHeader('Content-Length', (string) $input->getSize());
 
 		if ($input->getInputType() === Input::INPUT_DATA)
 		{
@@ -840,7 +840,7 @@ class Connector
 		}
 
 		$parsedBody = $response->getParsedBody();
-		if ($parsedBody and strpos($input->getSize(), ',') === false) {
+		if ($parsedBody) {
 			// For some moronic reason, trying to multipart upload files on some hosts comes back with a crazy
 			// error from Amazon that we need to set Content-Length:5242880,5242880 instead of
 			// Content-Length:5242880 which is AGAINST Amazon's documentation. In this case we pass the header

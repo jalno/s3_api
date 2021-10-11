@@ -16,8 +16,8 @@ class V4 extends Signature
 	 * Pre-process the request headers before we convert them to cURL-compatible format. Used by signature engines to
 	 * add custom headers, e.g. x-amz-content-sha256
 	 *
-	 * @param   array  $headers     The associative array of headers to process
-	 * @param   array  $amzHeaders  The associative array of amz-* headers to process
+	 * @param   array<string, string|int|null>  $headers     The associative array of headers to process
+	 * @param   array<string, string|int|null>  $amzHeaders  The associative array of amz-* headers to process
 	 *
 	 * @return  void
 	 */
@@ -71,7 +71,7 @@ class V4 extends Signature
 		$this->request->setHeader('Host', $hostname);
 
 		// Set the expiration time in seconds
-		$this->request->setHeader('Expires', (int) $lifetime);
+		$this->request->setHeader('Expires', (string) $lifetime);
 
 		// Get the query parameters, including the calculated signature
 		$bucket           = $this->request->getBucket();
