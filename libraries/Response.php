@@ -30,4 +30,44 @@ class Response extends BaseResponse {
 
 		return $this->parsedBody;
 	}
+
+	public function hasValidStatusCode(?array $validHttpStatusCodes = null): bool {
+		$statusCode = $this->getStatusCode();
+		if ($validHttpStatusCodes and !in_array($statusCode, $validHttpStatusCodes)) {
+			return false;
+		}
+		return true;
+	}
+
+	public function isError(): bool {
+		$parsedBody = $this->getParsedBody();
+		if ($parsedBody and isset($parsedBody->Code, $parsedBody->Message)) {
+			return true;
+		}
+		return false;
+	}
+
+	public function getError(): ?Error {
+		if (!$this->isError()) {
+			return null;
+		}
+		$parsedBody = $this->getParsedBody();
+		$error = new Error($parsedBody->Code, $parsedBody->Message);
+		if (isset($parsedBody->BucketName)) {
+			$error->setBucketName($parsedBody->BucketName);
+		}
+		if (isset($parsedBody->BucketName)) {
+			$error->setBucketName($parsedBody->BucketName);
+		}
+		if (isset($parsedBody->Resource)) {
+			$error->setResource($parsedBody->Resource);
+		}
+		if (isset($parsedBody->RequestId)) {
+			$error->setRequestId($parsedBody->RequestId);
+		}
+		if (isset($parsedBody->HostId)) {
+			$error->setHostId($parsedBody->HostId);
+		}
+		return $error;
+	}
 }

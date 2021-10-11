@@ -1,9 +1,6 @@
 <?php
 namespace packages\aws_s3_api\Exception;
 
-use RuntimeException;
-
-class CannotGetBucket extends RuntimeException
+class CannotGetBucket extends ResponseException
 {
-
 }

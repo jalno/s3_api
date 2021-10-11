@@ -74,7 +74,7 @@ class Connector
 				($input->getInputType() == Input::INPUT_DATA) and (!strlen($input->getDataReference())
 			)))
 		) {
-			throw new CannotPutFile('Missing input parameters', 0);
+			throw new CannotPutFile(0, 'Missing input parameters');
 		}
 
 		// We need to post with Content-Length and Content-Type, MD5 is optional
@@ -90,12 +90,19 @@ class Connector
 
 		$response = $request->getResponse();
 
-		if ($response->getStatusCode() !== 200)
-		{
-			throw new CannotPutFile(sprintf(
-				__METHOD__ . "(): Unexpected HTTP status [%s] \n\nDebug info:\nrequest: %s \n",
-				$response->getStatusCode(), print_r($request, true)
-			));
+		if (!$response->hasValidStatusCode([200])) {
+			$e = new CannotPutFile(
+				$response->getStatusCode(),
+				sprintf(
+					__METHOD__ . "(): Unexpected HTTP status [%s] \n\nDebug info:\nrequest: %s \n",
+					$response->getStatusCode(), print_r($request, true)
+				)
+			);
+			$e->setRequest($request);
+			$e->setResponse($response);
+			throw $e;
+		} elseif ($response->isError()) {
+			throw CannotPutFile::fromError($response->getError(), $request, $response);
 		}
 
 		$parsedBody = $response->getParsedBody();
@@ -168,13 +175,19 @@ class Connector
 
 		$response = $request->getResponse();
 
-		if (!in_array($response->getStatusCode(), [200, 206])) {
-			throw new CannotGetFile(sprintf(
-				__METHOD__ . "({$bucket}, {$uri}): [%s] %s\n\nDebug info:\n%s",
+		if (!$response->hasValidStatusCode([200, 206])) {
+			$e = new CannotGetFile(
 				$response->getStatusCode(),
-				"Unexpected http code",
-				print_r($response, true))
+				sprintf(
+					__METHOD__ . "(): Unexpected HTTP status [%s] \n\nDebug info:\nrequest: %s \n",
+					$response->getStatusCode(), print_r($request, true)
+				)
 			);
+			$e->setRequest($request);
+			$e->setResponse($response);
+			throw $e;
+		} elseif ($response->isError()) {
+			throw CannotGetFile::fromError($response->getError(), $request, $response);
 		}
 
 		return empty($saveTo) ? $response->getBody() : null;
@@ -197,14 +210,21 @@ class Connector
 
 		$response = $request->getResponse();
 
-		if (!in_array($response->getStatusCode(), [200, 206])) {
-			throw new CannotGetFile(sprintf(
-				__METHOD__ . "({$bucket}, {$uri}): [%s] %s\n\nDebug info:\n%s",
+		if (!$response->hasValidStatusCode([200, 206])) {
+			$e = new CannotGetFile(
 				$response->getStatusCode(),
-				"Unexpected http code",
-				print_r($response, true))
+				sprintf(
+					__METHOD__ . "(): Unexpected HTTP status [%s] \n\nDebug info:\nrequest: %s \n",
+					$response->getStatusCode(), print_r($request, true)
+				)
 			);
+			$e->setRequest($request);
+			$e->setResponse($response);
+			throw $e;
+		} elseif ($response->isError()) {
+			throw CannotGetFile::fromError($response->getError(), $request, $response);
 		}
+
 		if ($response->getHeader('date')) {
 			$response->setHeader('date', Date\Gregorian::strtotime($response->getHeader('date')));
 		}
@@ -229,13 +249,19 @@ class Connector
 		$request  = new Request('DELETE', $bucket, $uri, clone $this->configuration);
 		$response = $request->getResponse();
 
-		if ($response->getStatusCode() != 204) {
-			throw new CannotDeleteFile(sprintf(
-				__METHOD__ . "({$bucket}, {$uri}): [%s] %s\n\nDebug info:\n%s",
+		if (!$response->hasValidStatusCode([200, 204])) {
+			$e = new CannotDeleteFile(
 				$response->getStatusCode(),
-				"Unexpected http code",
-				print_r($response, true))
+				sprintf(
+					__METHOD__ . "(): Unexpected HTTP status [%s] \n\nDebug info:\nrequest: %s \n",
+					$response->getStatusCode(), print_r($request, true)
+				)
 			);
+			$e->setRequest($request);
+			$e->setResponse($response);
+			throw $e;
+		} elseif ($response->isError()) {
+			throw CannotDeleteFile::fromError($response->getError(), $request, $response);
 		}
 	}
 
@@ -335,11 +361,19 @@ class Connector
 
 		$response = $request->getResponse();
 
-		if ($response->getStatusCode() != 200) {
-			throw new CannotGetBucket(
-				sprintf(__METHOD__ . "(): [%s] %s", $response->getStatusCode(), "Unexpected status code"),
-				$response->getStatusCode()
+		if (!$response->hasValidStatusCode([200])) {
+			$e = new CannotGetBucket(
+				$response->getStatusCode(),
+				sprintf(
+					__METHOD__ . "(): Unexpected HTTP status [%s] \n\nDebug info:\nrequest: %s \n",
+					$response->getStatusCode(), print_r($request, true)
+				)
 			);
+			$e->setRequest($request);
+			$e->setResponse($response);
+			throw $e;
+		} elseif ($response->isError()) {
+			throw CannotGetBucket::fromError($response->getError(), $request, $response);
 		}
 
 		$result = 'us-east-1';
@@ -382,7 +416,10 @@ class Connector
 	 */
 	public function getBucket(string $bucket, ?string $prefix = null, ?string $marker = null, ?int $maxKeys = null, string $delimiter = '/', bool $returnCommonPrefixes = false): array
 	{
-		$request = new Request('GET', $bucket, '', $this->configuration);
+		$configuration = clone $this->configuration;
+		$configuration->setRegion('us-east-1');
+
+		$request = new Request('GET', $bucket, '', $configuration);
 
 		if (!empty($prefix))
 		{
@@ -406,11 +443,16 @@ class Connector
 
 		$response = $request->getResponse();
 
-		if ($response->getStatusCode() != 200) {
-			throw new CannotGetBucket(
-				sprintf(__METHOD__ . "(): [%s] %s", $response->getStatusCode(), "Unexpected status code"),
-				$response->getStatusCode()
+		if (!$response->hasValidStatusCode([200])) {
+			$e = new CannotGetBucket(
+				$response->getStatusCode(),
+				sprintf(__METHOD__ . "(): [%s] %s", $response->getStatusCode(), "Unexpected status code")
 			);
+			$e->setRequest($request);
+			$e->setResponse($response);
+			throw $e;
+		} elseif ($response->isError()) {
+			throw CannotGetBucket::fromError($response->getError(), $request, $response);
 		}
 
 		$results = [];
@@ -552,11 +594,19 @@ class Connector
 		$request  = new Request('GET', '', '', $configuration);
 		$response = $request->getResponse();
 
-		if ($response->getStatusCode() != 200) {
-			throw new CannotListBuckets(
-				sprintf(__METHOD__ . "(): [%s] Unexpected HTTP status", $response->getStatusCode()),
-				$response->getStatusCode()
+		if (!$response->hasValidStatusCode([200])) {
+			$e = new CannotListBuckets(
+				$response->getStatusCode(),
+				sprintf(
+					__METHOD__ . "(): Unexpected HTTP status [%s] \n\nDebug info:\nrequest: %s \n",
+					$response->getStatusCode(), print_r($request, true)
+				)
 			);
+			$e->setRequest($request);
+			$e->setResponse($response);
+			throw $e;
+		} elseif ($response->isError()) {
+			throw CannotListBuckets::fromError($response->getError(), $request, $response);
 		}
 
 		$result = [
@@ -630,13 +680,21 @@ class Connector
 
 		$response = $request->getResponse();
 
-		if ($response->getStatusCode() != 200)
-		{
-			throw new CannotPutFile(sprintf(
-				__METHOD__ . "(): [%s] %s\n\nDebug info:\n%s",
-				$response->getStatusCode(), 'Unexpected HTTP status', print_r($request, true)
-			));
+		if (!$response->hasValidStatusCode([200])) {
+			$e = new CannotPutFile(
+				$response->getStatusCode(),
+				sprintf(
+					__METHOD__ . "(): Unexpected HTTP status [%s] \n\nDebug info:\nrequest: %s \n",
+					$response->getStatusCode(), print_r($request, true)
+				)
+			);
+			$e->setRequest($request);
+			$e->setResponse($response);
+			throw $e;
+		} elseif ($response->isError()) {
+			throw CannotPutFile::fromError($response->getError(), $request, $response);
 		}
+
 		$parsedBody = $response->getParsedBody();
 
 		return $parsedBody ? (string) $parsedBody->UploadId : null;
@@ -667,6 +725,7 @@ class Connector
 		if (empty($UploadID))
 		{
 			throw new CannotPutFile(
+				0,
 				__METHOD__ . '(): No UploadID specified'
 			);
 		}
@@ -674,6 +733,7 @@ class Connector
 		if (empty($PartNumber))
 		{
 			throw new CannotPutFile(
+				0,
 				__METHOD__ . '(): No PartNumber specified'
 			);
 		}
@@ -764,11 +824,19 @@ class Connector
 
 		$response = $request->getResponse();
 
-		if ($response->getStatusCode() !== 200)
-		{
-			throw new CannotPutFile(
-				sprintf(__METHOD__ . "(): [%s] Unexpected HTTP status\n\nDebug info:\n%s", $response->getStatusCode(), print_r($request, true))
+		if (!$response->hasValidStatusCode([200])) {
+			$e = new CannotPutFile(
+				$response->getStatusCode(),
+				sprintf(
+					__METHOD__ . "(): Unexpected HTTP status [%s] \n\nDebug info:\nrequest: %s \n",
+					$response->getStatusCode(), print_r($request, true)
+				)
 			);
+			$e->setRequest($request);
+			$e->setResponse($response);
+			throw $e;
+		} elseif ($response->isError()) {
+			throw CannotPutFile::fromError($response->getError(), $request, $response);
 		}
 
 		$parsedBody = $response->getParsedBody();
@@ -808,6 +876,7 @@ class Connector
 			}
 		} else {
 			throw new CannotPutFile(
+				$response->getStatusCode(),
 				sprintf(__METHOD__ . "(): Can not parse result, Debug info:\n%s", print_r($request, true))
 			);
 		}
@@ -835,6 +904,7 @@ class Connector
 		if (empty($etags))
 		{
 			throw new CannotPutFile(
+				'0',
 				__METHOD__ . '(): No ETags array specified'
 			);
 		}
@@ -842,6 +912,7 @@ class Connector
 		if (empty($UploadID))
 		{
 			throw new CannotPutFile(
+				'0',
 				__METHOD__ . '(): No UploadID specified'
 			);
 		}
@@ -870,13 +941,19 @@ class Connector
 
 		$response = $request->getResponse();
 
-		if ($response->getStatusCode() != 200)
-		{
-			throw new CannotPutFile(sprintf(
-				__METHOD__ . "(): Unexpected HTTP status %s\n\nDebug info:\n%s",
+		if (!$response->hasValidStatusCode([200])) {
+			$e = new CannotPutFile(
 				$response->getStatusCode(),
-				print_r($request, true))
+				sprintf(
+					__METHOD__ . "(): Unexpected HTTP status [%s] \n\nDebug info:\nrequest: %s \n",
+					$response->getStatusCode(), print_r($request, true)
+				)
 			);
+			$e->setRequest($request);
+			$e->setResponse($response);
+			throw $e;
+		} elseif ($response->isError()) {
+			throw CannotPutFile::fromError($response->getError(), $request, $response);
 		}
 	}
 

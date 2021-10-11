@@ -2,7 +2,6 @@
 namespace packages\aws_s3_api\Exception;
 
 use RuntimeException;
-
 /**
  * Configuration error
  */
