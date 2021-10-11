@@ -360,7 +360,6 @@ class Request
 		}
 
 		$requestParams = [
-			'curl_options' => [],
 			'headers' => [],
 			'allow_redirects' => true,
 			'base_uri' => $schema . $this->headers['Host'],
@@ -416,8 +415,6 @@ class Request
 					$requestParams['body'] = $file;
 				}
 			}
-		} elseif (in_array(strtoupper($this->verb), ['HEAD', 'DELETE'])) {
-			$requestParams['curl_options'][CURLOPT_NOBODY] = true;
 		}
 
 		$httpResponse = null;
