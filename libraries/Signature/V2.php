@@ -1,7 +1,7 @@
 <?php
-namespace packages\aws_s3_api\Signature;
+namespace packages\s3_api\Signature;
 
-use packages\aws_s3_api\Signature;
+use packages\s3_api\Signature;
 
 /**
  * Implements the Amazon AWS v2 signatures

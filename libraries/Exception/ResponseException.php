@@ -1,8 +1,8 @@
 <?php
-namespace packages\aws_s3_api\Exception;
+namespace packages\s3_api\Exception;
 
-use packages\aws_s3_api\{Exception, Request, Response};
-use packages\aws_s3_api\Response\Error;
+use packages\s3_api\{Exception, Request, Response};
+use packages\s3_api\Response\Error;
 
 class ResponseException extends Exception {
 

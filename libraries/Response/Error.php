@@ -1,5 +1,5 @@
 <?php
-namespace packages\aws_s3_api\Response;
+namespace packages\s3_api\Response;
 
 use packages\base\view\Error as BaseError;
 

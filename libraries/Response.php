@@ -1,9 +1,9 @@
 <?php
-namespace packages\aws_s3_api;
+namespace packages\s3_api;
 
 use packages\base\http\Response as BaseResponse;
-use packages\aws_s3_api\Exception\PropertyNotFound;
-use packages\aws_s3_api\Response\Error;
+use packages\s3_api\Exception\PropertyNotFound;
+use packages\s3_api\Response\Error;
 use RunTimeException;
 use SimpleXMLElement;
 

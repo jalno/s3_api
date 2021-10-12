@@ -1,5 +1,5 @@
 <?php
-namespace packages\aws_s3_api\Exception;
+namespace packages\s3_api\Exception;
 
 class CannotDeleteFile extends ResponseException
 {

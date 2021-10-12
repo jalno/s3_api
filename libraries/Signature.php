@@ -1,5 +1,5 @@
 <?php
-namespace packages\aws_s3_api;
+namespace packages\s3_api;
 
 /**
  * Base class for request signing objects.

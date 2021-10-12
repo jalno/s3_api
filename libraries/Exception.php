@@ -1,7 +1,7 @@
 <?php
-namespace packages\aws_s3_api;
+namespace packages\s3_api;
 
-use packages\aws_s3_api\Response\Error;
+use packages\s3_api\Response\Error;
 use Throwable;
 
 class Exception extends \Exception {

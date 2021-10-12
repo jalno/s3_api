@@ -1,8 +1,8 @@
 <?php
-namespace packages\aws_s3_api;
+namespace packages\s3_api;
 
 use packages\base\{Date, HTTP, IO\File};
-use packages\aws_s3_api\Response\Error;
+use packages\s3_api\Response\Error;
 
 class Request
 {

@@ -1,14 +1,14 @@
 <?php
-namespace packages\aws_s3_api;
+namespace packages\s3_api;
 
 use InvalidArgumentException;
 use packages\base\{Date, IO\Buffer, IO\File};
-use packages\aws_s3_api\Exception\CannotDeleteFile;
-use packages\aws_s3_api\Exception\CannotGetBucket;
-use packages\aws_s3_api\Exception\CannotGetFile;
-use packages\aws_s3_api\Exception\CannotListBuckets;
-use packages\aws_s3_api\Exception\CannotOpenFileForWrite;
-use packages\aws_s3_api\Exception\CannotPutFile;
+use packages\s3_api\Exception\CannotDeleteFile;
+use packages\s3_api\Exception\CannotGetBucket;
+use packages\s3_api\Exception\CannotGetFile;
+use packages\s3_api\Exception\CannotListBuckets;
+use packages\s3_api\Exception\CannotOpenFileForWrite;
+use packages\s3_api\Exception\CannotPutFile;
 
 class Connector
 {
