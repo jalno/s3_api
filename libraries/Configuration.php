@@ -1,10 +1,18 @@
 <?php
 namespace packages\s3_api;
 
+use packages\base\Loader;
+
 /**
  * Holds the Amazon S3 confiugration credentials
  */
 class Configuration {
+
+	/**
+	 * print credentials data like key and secret, ... in var_dump or print_r
+	 */
+	protected $printCredentials = false;
+
 	/**
 	 * Access Key
 	 *
@@ -90,6 +98,24 @@ class Configuration {
 		if ($endpoint !== null) {
 			$this->setEndpoint($endpoint);
 		}
+		$this->printCredentials = Loader::isDebug();
+	}
+
+	/**
+	 * This magic method indicates which properites shown in export of var_dump or print_r
+	 *
+	 * removes credentials data in dumping by $printCredentials flags status
+	 *
+	 * @return array
+	 */
+	public function __debugInfo(): array {
+		$properties = get_object_vars($this);
+		if (!$this->printCredentials) {
+			foreach (['access', 'secret', 'token', 'region', 'endpoint'] as $property) {
+				$properties[$property] = '*******';
+			}
+		}
+		return $properties;
 	}
 
 	/**
