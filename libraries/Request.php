@@ -37,21 +37,21 @@ class Request
 	/**
 	 * Query string parameters
 	 *
-	 * @var  array
+	 * @var  array<string, string|int>
 	 */
 	private $parameters = [];
 
 	/**
 	 * Amazon-specific headers to pass to the request
 	 *
-	 * @var  array
+	 * @var  array<string, string|int>
 	 */
 	private $amzHeaders = [];
 
 	/**
 	 * Regular HTTP headers to send in the request
 	 *
-	 * @var  array
+	 * @var  array<string, string|int>
 	 */
 	private $headers = [
 		'Host'         => '',
@@ -234,7 +234,7 @@ class Request
 	/**
 	 * Get the parameters array
 	 *
-	 * @return  array
+	 * @return  array<string, string|int>
 	 */
 	public function getParameters(): array
 	{
@@ -244,7 +244,7 @@ class Request
 	/**
 	 * Get the Amazon headers array
 	 *
-	 * @return  array
+	 * @return  array<string, string|int>
 	 */
 	public function getAmzHeaders(): array
 	{
@@ -254,7 +254,7 @@ class Request
 	/**
 	 * Get the other headers array
 	 *
-	 * @return  array
+	 * @return  array<string, string|int>
 	 */
 	public function getHeaders(): array
 	{
@@ -284,7 +284,7 @@ class Request
 	/**
 	 * Set the data resource as a file pointer
 	 *
-	 * @param File\Local $file
+	 * @param File\Local|null $file
 	 */
 	public function setFile(?File\Local $file = null): void
 	{
@@ -377,7 +377,7 @@ class Request
 			'Authorization' => $signer->getAuthorizationHeader(),
 		];
 		foreach (array_merge($this->headers, $this->amzHeaders) as $header => $value) {
-			if (strlen($value) > 0) {
+			if (strlen((string) $value) > 0) {
 				$requestParams['headers'][$header] = $value;
 			}
 		}
@@ -390,9 +390,9 @@ class Request
 			 * Caveat: if your bucket contains dots in the name we have to turn off host verification due to the way the
 			 * S3 SSL certificates are set up.
 			 */
-			$isAmazonS3  = (substr($this->headers['Host'], -14) == '.amazonaws.com') ||
-				substr($this->headers['Host'], -16) == 'amazonaws.com.cn';
-			$tooManyDots = substr_count($this->headers['Host'], '.') > 4;
+			$isAmazonS3  = (substr((string) $this->headers['Host'], -14) == '.amazonaws.com') ||
+				substr((string) $this->headers['Host'], -16) == 'amazonaws.com.cn';
+			$tooManyDots = substr_count((string) $this->headers['Host'], '.') > 4;
 
 			$requestParams['ssl_verify'] = $isAmazonS3 and $tooManyDots;
 		}
@@ -491,7 +491,7 @@ class Request
 				else
 				{
 					// Parameters must be URL-encoded
-					$query .= $var . '=' . rawurlencode($value) . '&';
+					$query .= $var . '=' . rawurlencode((string) $value) . '&';
 				}
 			}
 

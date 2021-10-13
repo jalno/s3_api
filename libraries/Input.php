@@ -267,7 +267,7 @@ class Input
 	 *
 	 * @param   string|null  $type
 	 */
-	public function setType(?string $type)
+	public function setType(?string $type): void
 	{
 		$this->type = $type;
 	}
@@ -450,7 +450,10 @@ class Input
 		}
 		elseif (function_exists('mime_content_type'))
 		{
-			$type = trim(mime_content_type($file->getPath()));
+			$type = mime_content_type($file->getPath());
+			if ($type !== false) {
+				$type = trim($type);
+			}
 		}
 
 		if ($type !== false && strlen($type) > 0)
@@ -508,7 +511,11 @@ class Input
 				return base64_encode(md5($this->data, true));
 
 			case self::INPUT_FILE:
-				return base64_encode(md5_file($this->file->getPath(), true));
+				$md5 = md5_file($this->file->getPath(), true);
+				if ($md5 === false) {
+					throw new Exception("can not calculate md5 of file");
+				}
+				return base64_encode($md5);
 		}
 
 		return '';
@@ -520,13 +527,17 @@ class Input
 	 * @return  string  Lowercase hex representation of the SHA-256 sum
 	 */
 	private function calculateSha256(): string {
-		$inputType = $this->getInputType();
-		switch ($inputType) {
+		$hash = '';
+		switch ($this->getInputType()) {
 			case self::INPUT_DATA:
-				return hash('sha256', $this->data, false);
-
+				$hash = hash('sha256', $this->data, false);
+				break;
 			case self::INPUT_FILE:
-				return hash_file('sha256', $this->file->getPath(), false);
+				$hash = hash_file('sha256', $this->file->getPath(), false);
+				break;
+		}
+		if ($hash === false) {
+			throw new Exception("can not calculate hash of file");
 		}
 		return '';
 	}

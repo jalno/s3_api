@@ -56,10 +56,10 @@ class Response extends BaseResponse {
 	}
 
 	public function getError(): ?Error {
-		if (!$this->isError()) {
+		$parsedBody = $this->getParsedBody();
+		if (!$this->isError() or !$parsedBody) {
 			return null;
 		}
-		$parsedBody = $this->getParsedBody();
 		$error = new Error($parsedBody->Code, $parsedBody->Message);
 		if (isset($parsedBody->BucketName)) {
 			$error->setBucketName($parsedBody->BucketName);

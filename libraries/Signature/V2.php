@@ -105,7 +105,7 @@ class V2 extends Signature
 		// Collect AMZ headers for signature
 		foreach ($amzHeaders as $header => $value)
 		{
-			if (strlen($value) > 0)
+			if (strlen((string) $value) > 0)
 			{
 				$amz[] = strtolower($header) . ':' . $value;
 			}
@@ -151,7 +151,7 @@ class V2 extends Signature
 			$stringToSign = $headers['Date'];
 		}
 
-		$amazonV2Hash = $this->amazonV2Hash($stringToSign);
+		$amazonV2Hash = $this->amazonV2Hash((string) $stringToSign);
 
 		// For presigned URLs we only return the Base64-encoded signature without the AWS format specifier and the
 		// public access key.

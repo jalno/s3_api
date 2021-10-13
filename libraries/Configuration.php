@@ -10,6 +10,8 @@ class Configuration {
 
 	/**
 	 * print credentials data like key and secret, ... in var_dump or print_r
+	 *
+	 * @var bool $printCredentials
 	 */
 	protected $printCredentials = false;
 
@@ -106,7 +108,7 @@ class Configuration {
 	 *
 	 * removes credentials data in dumping by $printCredentials flags status
 	 *
-	 * @return array
+	 * @return array<string, mixed>
 	 */
 	public function __debugInfo(): array {
 		$properties = get_object_vars($this);

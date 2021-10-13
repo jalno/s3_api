@@ -37,7 +37,7 @@ class Connector
 	 * @param   string  $uri             Object URI. Think of it as the absolute path of the file in the bucket.
 	 * @param   string  $acl             ACL constant, by default the object is private (visible only to the uploading
 	 *                                   user)
-	 * @param   array   $requestHeaders  Array of request headers
+	 * @param   array<string, string>   $requestHeaders  Array of request headers
 	 *
 	 * @return  void
 	 *
@@ -199,7 +199,24 @@ class Connector
 	 * @param   string                $bucket  Bucket name
 	 * @param   string                $uri     Object URI
 	 *
-	 * @return  array  The headers returned by Amazon S3
+	 * @return  array{
+	 * 	"accept-ranges": string,
+	 * 	"content-length": string,
+	 * 	"content-security-policy"?: string,
+	 * 	"content-type": string,
+	 * 	"etag": string,
+	 * 	"last-modified": string,
+	 * 	"server"?: string,
+	 * 	"strict-transport-security"?: string,
+	 * 	"vary": string,
+	 * 	"x-amz-request-id": string,
+	 * 	"x-content-type-options"?: string,
+	 * 	"x-xss-protection"?: string,
+	 * 	"date": int,
+	 * 	"size": int,
+	 * 	"type": string,
+	 * 	"hash": string,
+	 * }  The headers returned by Amazon S3
 	 *
 	 * @throws  CannotGetFile  If the file does not exist
 	 * @see     https://docs.aws.amazon.com/AmazonS3/latest/API/API_HeadObject.html
@@ -412,7 +429,14 @@ class Connector
 	 * @param   string       $delimiter             Delimiter, typically "/"
 	 * @param   bool         $returnCommonPrefixes  Set to true to return CommonPrefixes
 	 *
-	 * @return  array
+	 * @return  array<string, array{
+	 * 	"name": string,
+	 * 	"time": int,
+	 * 	"size": int,
+	 * 	"hash": string
+	 * }|array{
+	 * 	"prefix": string
+	 * }>
 	 */
 	public function getBucket(string $bucket, ?string $prefix = null, ?string $marker = null, ?int $maxKeys = null, string $delimiter = '/', bool $returnCommonPrefixes = false): array
 	{
@@ -583,7 +607,10 @@ class Connector
 	/**
 	 * Get a list of buckets
 	 *
-	 * @return  array
+	 * @return  array{
+	 * 	"owner": null|array<int, array{"id": string, "name": string}>,
+	 * 	"buckets": array<int, array{"name": string, "time": int}>,
+	 * }
 	 */
 	public function listBuckets(): array
 	{
@@ -644,7 +671,7 @@ class Connector
 	 * @param   string  $bucket          Bucket name
 	 * @param   string  $uri             Object URI
 	 * @param   string  $acl             ACL constant
-	 * @param   array   $requestHeaders  Array of request headers
+	 * @param   array<string, string>   $requestHeaders  Array of request headers
 	 *
 	 * @return  string  The upload session ID (UploadId)
 	 */
@@ -706,7 +733,7 @@ class Connector
 	 * @param   Input   $input           Input data. You MUST specify the UploadID and PartNumber
 	 * @param   string  $bucket          Bucket name
 	 * @param   string  $uri             Object URI
-	 * @param   array   $requestHeaders  Array of request headers or content type as a string
+	 * @param   array<string, string>   $requestHeaders  Array of request headers or content type as a string
 	 * @param   int     $chunkSize       Size of each upload chunk, in bytes. It cannot be less than 5242880 bytes (5Mb)
 	 *
 	 * @return  null|string  The ETag of the upload part of null if we have ran out of parts to upload
@@ -794,8 +821,15 @@ class Connector
 			case Input::INPUT_FILE:
 				$file = $input->getFile();
 				$fp = fopen($file->getPath(), 'r');
+				if ($fp === false) {
+					throw new Exception("can not open file {$file->getPath()} for read");
+				}
 				fseek($fp, ($PartNumber - 1) * $chunkSize);
-				$input->setData(fread($fp, $size));
+				$data = fread($fp, $size);
+				if ($data === false) {
+					throw new Exception("can not read file {$file->getPath()}");
+				}
+				$input->setData($data);
 				break;
 		}
 
@@ -863,7 +897,7 @@ class Connector
 					{
 						if (!isset($requestHeaders['workaround-broken-content-length']))
 						{
-							$requestHeaders['workaround-broken-content-length'] = true;
+							$requestHeaders['workaround-broken-content-length'] = '1';
 
 							// This is required to reset the input size to its default value. If you don't do that
 							// only one part will ever be uploaded. Oops!

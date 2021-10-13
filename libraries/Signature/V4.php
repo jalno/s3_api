@@ -116,7 +116,7 @@ class V4 extends Signature
 		}
 
 		// Get the credentials scope
-		$signatureDate = new DateTime($headers['Date']);
+		$signatureDate = new DateTime((string) $headers['Date']);
 
 		$credentialScope = $signatureDate->format('Ymd') . '/' .
 			$this->request->getConfiguration()->getRegion() . '/' .
@@ -184,7 +184,7 @@ class V4 extends Signature
 				$v = "$v,$v";
 			}
 
-			$canonicalHeaders     .= $lowercaseHeaderName . ':' . trim($v) . "\n";
+			$canonicalHeaders     .= $lowercaseHeaderName . ':' . trim((string) $v) . "\n";
 			$signedHeadersArray[] = $lowercaseHeaderName;
 		}
 
