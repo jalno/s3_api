@@ -249,7 +249,11 @@ class Connector
 			$response->setHeader('last-modified', Date\Gregorian::strtotime($response->getHeader('last-modified')));
 		}
 
-		return $response->getHeaders();
+		/**
+		 * @var mixed
+		 */
+		$result = $response->getHeaders();
+		return $result;
 	}
 
 
@@ -607,10 +611,7 @@ class Connector
 	/**
 	 * Get a list of buckets
 	 *
-	 * @return  array{
-	 * 	"owner": null|array<int, array{"id": string, "name": string}>,
-	 * 	"buckets": array<int, array{"name": string, "time": int}>,
-	 * }
+	 * @return array{"owner":null|array<int,array{"id":string,"name":string}>,"buckets":array<int,array{"name":string,"time":int}>}
 	 */
 	public function listBuckets(): array
 	{
@@ -636,6 +637,9 @@ class Connector
 			throw CannotListBuckets::fromError($response->getError(), $request, $response);
 		}
 
+		/**
+		 * @var mixed
+		 */
 		$result = [
 			'owner' => null,
 			'buckets' => [],
