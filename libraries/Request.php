@@ -363,6 +363,7 @@ class Request
 			'headers' => [],
 			'allow_redirects' => true,
 			'base_uri' => $schema . $this->headers['Host'],
+			'connect_timeout' => 300,
 		];
 
 		$file = $this->getFile();
